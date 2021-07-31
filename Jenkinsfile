@@ -33,13 +33,12 @@ pipeline {
         }
         stage("Deploy") {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub’,
-                        usernameVariable: 'DOCKER_HUB_USER’,
-                        passwordVariable: 'DOCKER_HUB_PASSWD'
-                        )
-                ]) {
+                withCredentials([[
+                    $class: 'UsernamePasswordMultiBinding',
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_HUB_USER',
+                    passwordVariable: 'DOCKER_HUB_PASSWD'
+                ]]) {
                     sshagent(credentials: ['jenkins_deploy']) {
                         sh "${SSH} docker pull ${DOCKER_HUB_USER}/${DOCKER_IMAGE}:latest"
                         sh "${SSH} docker stop ${DOCKER_IMAGE}"
